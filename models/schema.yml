@@ -1,0 +1,49 @@
+version: 2
+
+sources:
+  - name: raw
+    description: Raw data from source systems
+    database: warehouse
+    schema: raw
+    tables:
+      - name: customers
+        description: Raw customer data
+      - name: orders
+        description: Raw order transactions
+
+models:
+  - name: stg_customers
+    description: Staging model for customers
+    columns:
+      - name: customer_id
+        description: Primary key for customers
+        tests:
+          - unique
+          - not_null
+
+      - name: email
+        description: Customer email address
+        tests:
+          - not_null
+
+  - name: fct_orders
+    description: Fact table containing all orders
+    columns:
+      - name: order_id
+        description: Primary key for orders
+        tests:
+          - unique
+          - not_null
+
+      - name: customer_id
+        description: Foreign key to customers
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+
+      - name: total_revenue
+        description: Calculated total revenue
+        tests:
+          - not_null
